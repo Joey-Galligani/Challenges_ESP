@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Authentication System</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        .login-container {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.3);
+            width: 400px;
+            margin: 0 auto;
+            backdrop-filter: blur(10px);
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #aaa;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #444;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        input:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+        }
+        .password-strength {
+            height: 5px;
+            background: #444;
+            margin-top: 5px;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .strength-meter {
+            height: 100%;
+            width: 0;
+            transition: width 0.3s ease;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        .login-btn {
+            background: #4CAF50;
+            color: white;
+        }
+        .reset-btn {
+            background: #f44336;
+            color: white;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .error {
+            color: #f44336;
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(244, 67, 54, 0.1);
+            border-radius: 5px;
+        }
+        .success {
+            color: #4CAF50;
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(76, 175, 80, 0.1);
+            border-radius: 5px;
+        }
+        .security-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            font-size: 14px;
+            color: #aaa;
+        }
+        .fake-links {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .fake-links a {
+            color: #4CAF50;
+            text-decoration: none;
+            margin: 0 10px;
+            font-size: 14px;
+        }
+        .fake-links a:hover {
+            text-decoration: underline;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #4CAF50;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Secure Authentication System</h1>
+            <p>Version 2.0.1 - Enhanced Security Protocol</p>
+        </div>
+
+        <div class="login-container">
+            <h2>Secure Login</h2>
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" placeholder="Enter your username">
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password">
+                <div class="password-strength">
+                    <div class="strength-meter" id="strengthMeter"></div>
+                </div>
+            </div>
+            <div class="button-group">
+                <button class="login-btn" onclick="checkLogin()">Login</button>
+                <button class="reset-btn" onclick="resetForm()">Reset</button>
+            </div>
+            <div class="loading" id="loading"></div>
+            <p id="error" class="error">Invalid credentials!</p>
+            <p id="success" class="success"></p>
+            
+            <div class="security-info">
+                <p>🔒 This system uses advanced encryption</p>
+                <p>🛡️ Protected by multiple security layers</p>
+                <p>⚡ Real-time threat detection active</p>
+            </div>
+
+            <div class="fake-links">
+                <a href="#" onclick="return false">Forgot Password?</a>
+                <a href="#" onclick="return false">Security Policy</a>
+                <a href="#" onclick="return false">Help Center</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chargement du backend -->
+    <script src="auth.js"></script>
+    
+    <!-- Code frontend -->
+    <script>
+        document.getElementById('password').addEventListener('input', function(e) {
+            const strength = Math.min(100, e.target.value.length * 10);
+            document.getElementById('strengthMeter').style.width = strength + '%';
+            document.getElementById('strengthMeter').style.background = 
+                strength < 30 ? '#f44336' : 
+                strength < 70 ? '#ff9800' : '#4CAF50';
+        });
+
+        function resetForm() {
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('strengthMeter').style.width = '0%';
+            document.getElementById('error').style.display = 'none';
+            document.getElementById('success').style.display = 'none';
+        }
+
+        // Fonction de login avec animation
+        async function checkLogin() {
+            const loading = document.getElementById('loading');
+            loading.style.display = 'block';
+            
+            try {
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                
+                const flag = await window.auth.verifyCredentials(username, password);
+                if (flag) {
+                    document.getElementById('success').style.display = 'block';
+                    document.getElementById('error').style.display = 'none';
+                    document.getElementById('success').textContent = 'Flag: ' + flag;
+                } else {
+                    document.getElementById('error').style.display = 'block';
+                    document.getElementById('success').style.display = 'none';
+                }
+            } catch (error) {
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('success').style.display = 'none';
+                document.getElementById('error').textContent = 'Erreur de connexion au serveur';
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        setInterval(() => {
+            console.log('Security check: ' + new Date().toISOString());
+        }, 5000);
+    </script>
+</body>
+</html> 
